@@ -16,65 +16,7 @@ ApplicationWindow {
     property bool animationRunning: rotateCW.running | rotateCCW.running | shrinkAnimation.running | blowAnimation.running
     property bool rightButtonPressed: false
 
-    RotationAnimation {
-        id: rotateCW
-        target: btn
-        from: 0
-        to: 90
-        duration: 100
-        onStopped: {
-            blowAnimation.start()
-        }
-    }
 
-    RotationAnimation {
-        id: rotateCCW
-        target: btn
-        from: 90
-        to: 0
-        duration: 100
-        onStopped: {
-            blowAnimation.start()
-        }
-    }
-
-    NumberAnimation {
-        id: shrinkAnimation
-        target: btn
-        easing.type: Easing.OutExpo
-        properties: "width, height"
-        from: btn.width
-        to: btn.width - 20
-        duration: 100
-        onStopped: {
-            if(btn.checked) {
-                rotateCCW.start()
-            } else {
-                rotateCW.start()
-            }
-        }
-        onStarted: {
-            if(btn.checked) {
-                widgetsOn = false
-            }
-        }
-    }
-
-    NumberAnimation {
-        id: blowAnimation
-        target: btn
-        properties: "width, height"
-        from: btn.width
-        to: btn.width + 20
-        duration: 100
-        easing.type: Easing.InExpo
-        onStopped: {
-            btn.checked = !btn.checked
-            if(btn.checked) {
-                widgetsOn = true
-            }
-        }
-    }
 
     Widgets {
         id:widgetsWindow
@@ -101,6 +43,39 @@ ApplicationWindow {
         onDraggingChanged: {
             if(btn.dragging && widgetsOn) {
                 shrinkAnimation.start()
+            }
+        }
+        DropArea {
+            id:btnDropArea
+            anchors.fill: parent
+            onEntered: {
+                console.log("Drop area entered")
+                btn.color = "#55e242"
+                btnText.color = "#ffffff"
+
+                if(btnDropArea.containsDrag) {
+                    console.log("Drop area has drag")
+                }
+            }
+            onDropped: {
+                console.log("Source", drop.text)
+                if (btn.checked) {
+                    btn.color = "#2e82d1"
+                    btnText.color = "#ffffff"
+                } else {
+                    btn.color = "#14426d"
+                    btnText.color = "#dfdfdf"
+                }
+            }
+
+            onExited: {
+                if (btn.checked) {
+                    btn.color = "#2e82d1"
+                    btnText.color = "#ffffff"
+                } else {
+                    btn.color = "#14426d"
+                    btnText.color = "#dfdfdf"
+                }
             }
         }
 
@@ -170,6 +145,65 @@ ApplicationWindow {
                     var delta = Qt.point(mouse.x - cpos.x, mouse.y - cpos.y);
                     appWindow.x += delta.x;
                     appWindow.y += delta.y;
+                }
+            }
+        }
+        RotationAnimation {
+            id: rotateCW
+            target: btn
+            from: 0
+            to: 90
+            duration: 100
+            onStopped: {
+                blowAnimation.start()
+            }
+        }
+
+        RotationAnimation {
+            id: rotateCCW
+            target: btn
+            from: 90
+            to: 0
+            duration: 100
+            onStopped: {
+                blowAnimation.start()
+            }
+        }
+
+        NumberAnimation {
+            id: shrinkAnimation
+            target: btn
+            easing.type: Easing.OutExpo
+            properties: "width, height"
+            from: btn.width
+            to: btn.width - 20
+            duration: 100
+            onStopped: {
+                if(btn.checked) {
+                    rotateCCW.start()
+                } else {
+                    rotateCW.start()
+                }
+            }
+            onStarted: {
+                if(btn.checked) {
+                    widgetsOn = false
+                }
+            }
+        }
+
+        NumberAnimation {
+            id: blowAnimation
+            target: btn
+            properties: "width, height"
+            from: btn.width
+            to: btn.width + 20
+            duration: 100
+            easing.type: Easing.InExpo
+            onStopped: {
+                btn.checked = !btn.checked
+                if(btn.checked) {
+                    widgetsOn = true
                 }
             }
         }
